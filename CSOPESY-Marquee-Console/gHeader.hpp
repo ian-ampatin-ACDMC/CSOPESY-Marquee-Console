@@ -10,10 +10,11 @@
 #include <mutex>
 #include <iomanip>
 #include <queue>
+#include <cstdlib>
 
 // --- Shared State and Thread Control ---
 // Global flat to signal all threads to exit
-std::string marqueeText = "CSOPESY --- Marquee Console";
+std::string marqueeText = "[CSOPESY] Marquee Console";
 std::atomic<bool> isRunning{ true };
 std::atomic<bool> marqueeRunning{ true };
 
@@ -26,8 +27,13 @@ std::queue<std::string> commandQueue;
 std::mutex commandQueueMutex;
 
 // The marquee logic thread and display thread share this variable
+std::vector<std::string> marqueeSubStrings = { "", "", "", ""};
 std::string marqueeDisplayBuffer = "";
 std::mutex marqueeDisplayMutex;
 
 // The main thread and marquee logic thread share this variable
 std::mutex mainMarqueeMutex;
+size_t marqueeSpeed = 200;
+
+// The main thread and display logic thread share this variable
+std::mutex mainDisplayMutex;

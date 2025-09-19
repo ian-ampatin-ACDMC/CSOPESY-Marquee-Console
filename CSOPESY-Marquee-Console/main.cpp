@@ -19,13 +19,13 @@ static void gotoxy(int x, int y) {
 
 // --- Thread Functions ---
 void keyboardHandlerThreadFunction() {
-	std::string command_line;
+	std::string commandLine;
 	while (isRunning) {
-		std::getline(std::cin, command_line);
+		std::getline(std::cin, commandLine);
 
-		if (!command_line.empty()) {
+		if (!commandLine.empty()) {
 			std::unique_lock<std::mutex> lock(commandQueueMutex);
-			commandQueue.push(command_line);
+			commandQueue.push(commandLine);
 			lock.unlock();
 		}
 	}
@@ -33,71 +33,153 @@ void keyboardHandlerThreadFunction() {
 
 void marqueeLogicThreadFunction(int displayWidth) {
 
-	std::vector<int> marqueeSpecs;
+	int startingPosition = displayWidth;
 
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
-	marqueeSpecs.push_back(0);
-	marqueeSpecs.push_back(0);
+	marqueeSubStrings.at(3) = std::string(displayWidth, '-');
 	marqueeDisplayLock.unlock();
 
 	while (isRunning) {
 		
-		std::unique_lock<std::mutex> commandQueueLock(commandQueueMutex);
+		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
 		size_t textLength = marqueeText.length();
-		commandQueueLock.unlock();
-
-		size_t startPos = displayWidth;
-
+		std::string marqueeToPrint = marqueeText;
+		mainMarqueeLock.unlock();
+		
 		while (isRunning) { 
+
 			
-			// CASE when marquee is not running
-			// set both specs to 0 and 0
+			marqueeDisplayLock.lock();
 			if (!marqueeRunning) {
-				marqueeDisplayLock.lock();
-				marqueeSpecs.at(0) = 0;
-				marqueeSpecs.at(1) = 0;
-				marqueeDisplayLock.unlock();
+				marqueeSubStrings.at(0) = std::string(displayWidth, ' ');
+				marqueeSubStrings.at(1) = "";
+				marqueeSubStrings.at(2) = "";
 			}
+			else {
+				marqueeSubStrings.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
+				
+				if (startingPosition > 0)
+				{
+					int difference = displayWidth - startingPosition;
+					if (difference > textLength) {
+						marqueeSubStrings.at(1) = marqueeToPrint;
+						marqueeSubStrings.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
+					}
+					else {
+						marqueeSubStrings.at(1) = marqueeToPrint.substr(0, difference);
+						marqueeSubStrings.at(2) = std::string(displayWidth - difference, ' ');
+					}
+				}
+				else {
+					marqueeSubStrings.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+				}
 
+				startingPosition--;
 
-			// Sleep for 200 milliseconds
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+				// When text disappears
+				if (startingPosition + textLength == 0)
+					startingPosition = displayWidth;
+			}
+			marqueeDisplayLock.unlock();
+
+			// Sleep
+			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+			std::this_thread::sleep_for(std::chrono::milliseconds(marqueeSpeed));
+			mainMarqueeLock.unlock();
 		}
 	}
 }
 
-void displayThread_func() {
+void displayThreadFunction() {
 	const int refresh_rate_ms = 50;
 	while (isRunning) {
-		// Display logic goes here...
+
+		// Marquee
+		gotoxy(0, 3);
+		std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
+		//std::cout << marqueeSubStrings.at(3) << std::endl;
+		std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2) << std::endl;
+		//std::cout << marqueeSubStrings.at(3);
+		marqueeDisplayLock.unlock();
+
+		// Prompt
+		gotoxy(0, 7);
+		std::unique_lock<std::mutex> mainDisplayLock(mainDisplayMutex);
+		std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
+			      << "Version Date: V225.919";
+		mainDisplayLock.unlock();
+
+		gotoxy(0, 10);
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(refresh_rate_ms));
 	}
+}
+
+// --- Main Thread Functions ---
+std::vector<std::string> getToken(std::string line) {
+	std::vector<std::string> tokens;
+	std::stringstream SS(line);
+	std::string collector;
+
+	while (getline(SS, collector, ' '))
+		tokens.push_back(collector);
+
+	return tokens;
 }
 
 // --- Main Function (Command Interpreter Thread) ---
 int main() {
 	// Start the three worker threads.
-	std::thread marqueeLogicThread(marqueeLogicThreadFunction, 80);
-	std::thread displayThread(displayThread_func);
+	std::thread marqueeLogicThread(marqueeLogicThreadFunction, 60);
+	std::thread displayThread(displayThreadFunction);
 	std::thread keyboardHandlerThread(keyboardHandlerThreadFunction);
 
 	// Main loop that processes commands from the queue
 	while (isRunning) {
-		std::string command_line;
+		std::string commandLine;
 		{
 			std::unique_lock<std::mutex> lock(commandQueueMutex);
 			
 			if (!commandQueue.empty()) {
-				command_line = commandQueue.front();
+				commandLine = commandQueue.front();
 				commandQueue.pop();
 			}
 		}
 
-		if (!command_line.empty()) {
-			// Commad processing logic goes here...
-			if (command_line == "exit") {
+		if (!commandLine.empty()) {
+			// Locks
+			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+			mainMarqueeLock.unlock();
+			std::vector<std::string> commandTokens = getToken(commandLine);
+			std::string fToken = commandTokens.at(0);
+			commandTokens.erase(commandTokens.begin());
+
+			if (fToken == "help") {
+
+			}
+			else if (fToken == "start_marquee") {
+				mainMarqueeLock.lock();
+				marqueeRunning = true;
+				mainMarqueeLock.unlock();
+			}
+			else if (fToken == "stop_marquee") {
+				mainMarqueeLock.lock();
+				marqueeRunning = false;
+				mainMarqueeLock.unlock();
+			}
+			else if (fToken == "set_text") {
+				
+			}
+			else if (fToken == "set_speed") {
+
+			}
+			else if (fToken == "exit") {
 				clearScreen();
 				isRunning = false;
+			}
+			else {
+				// Call prompt here
+				clearScreen();
 			}
 		}
 		
