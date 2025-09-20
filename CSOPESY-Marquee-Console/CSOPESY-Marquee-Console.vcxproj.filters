@@ -21,6 +21,15 @@
     <ClCompile Include="marqueeClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="utilityFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commandFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="threadFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gHeader.hpp">

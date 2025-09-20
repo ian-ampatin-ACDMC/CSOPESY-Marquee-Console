@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GHEADER
+#define GHEADER
 
 #include <iostream>
 #include <string>
@@ -16,30 +17,48 @@
 
 // --- Shared State and Thread Control ---
 // Global flat to signal all threads to exit
-std::string marqueeText = "[CSOPESY] Marquee Console";
-std::atomic<bool> isRunning{ true };
-std::atomic<bool> marqueeRunning{ true };
+extern std::string marqueeText;
+extern std::atomic<bool> isRunning;
+extern std::atomic<bool> marqueeRunning;
 
 // The command interpreter and display thread share this variable
-std::string promptDisplayBuffer = "";
-std::mutex promptMutex;
+extern std::string promptDisplayBuffer;
+extern std::mutex promptMutex;
 
 // Shared state for the keyboard handler and command interpreter
-std::queue<std::string> commandQueue;
-std::mutex commandQueueMutex;
+extern std::queue<std::string> commandQueue;
+extern std::mutex commandQueueMutex;
 
 // The marquee logic thread and display thread share this variable
-std::vector<std::string> marqueeSubStrings = { "", "", "", ""};
-std::string marqueeDisplayBuffer = "";
-std::mutex marqueeDisplayMutex;
+extern std::vector<std::string> marqueeSubStrings;
+extern std::string marqueeDisplayBuffer;
+extern std::mutex marqueeDisplayMutex;
 
 // The main thread and marquee logic thread share this variable
-std::string systemPromptText = "";
-std::mutex mainMarqueeMutex;
-std::atomic<bool> printHelp{ false };
-std::atomic<bool> printText{ true };
-std::atomic<bool> printPrompt{ false };
-size_t marqueeSpeed = 200;
+extern std::string systemPromptText;
+extern std::mutex mainMarqueeMutex;
+extern std::atomic<bool> printHelp;
+extern std::atomic<bool> printText;
+extern std::atomic<bool> printPrompt;
+extern size_t marqueeSpeed;
 
 // The main thread and display logic thread share this variable
-std::mutex mainDisplayMutex;
+extern std::mutex mainDisplayMutex;
+
+// --- Utility Functions ---
+void clearScreen();
+void gotoxy(int x, int y);
+std::vector<std::string> getToken(std::string line);
+
+// --- Thread Function --- 
+void keyboardHandlerThreadFunction();
+void marqueeLogicThreadFunction(int displayWidth);
+void displayThreadFunction();
+
+// --- Command Functions ---
+void setMarqueeText(std::vector<std::string> tokens);
+void setMarqueeSpeed(std::vector<std::string> tokens);
+void systemPrompt(std::string prompt);
+
+
+#endif GHEADER
