@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="marqueeClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gHeader.hpp" />

@@ -11,6 +11,8 @@
 #include <iomanip>
 #include <queue>
 #include <cstdlib>
+#include <conio.h>
+#include <Windows.h>
 
 // --- Shared State and Thread Control ---
 // Global flat to signal all threads to exit
@@ -32,7 +34,11 @@ std::string marqueeDisplayBuffer = "";
 std::mutex marqueeDisplayMutex;
 
 // The main thread and marquee logic thread share this variable
+std::string systemPromptText = "";
 std::mutex mainMarqueeMutex;
+std::atomic<bool> printHelp{ false };
+std::atomic<bool> printText{ true };
+std::atomic<bool> printPrompt{ false };
 size_t marqueeSpeed = 200;
 
 // The main thread and display logic thread share this variable

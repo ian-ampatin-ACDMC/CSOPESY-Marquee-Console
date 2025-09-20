@@ -15,6 +15,12 @@ static void clearScreen() {
 // Moves the cursor to a specific (x, y) coordinate on the console.
 static void gotoxy(int x, int y) {
 	std::cout << "\033[" << y << ";" << x << "H";
+	std::cout.flush();
+
+	/*COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);*/
 }
 
 // --- Thread Functions ---
@@ -40,82 +46,144 @@ void marqueeLogicThreadFunction(int displayWidth) {
 	marqueeDisplayLock.unlock();
 
 	while (isRunning) {
-		
 		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
 		size_t textLength = marqueeText.length();
 		std::string marqueeToPrint = marqueeText;
 		mainMarqueeLock.unlock();
-		
-		while (isRunning) { 
-
+	
+		marqueeDisplayLock.lock();
+		if (!marqueeRunning) {
+			//marqueeSubStrings.at(0) = std::string(displayWidth, ' ');
+			marqueeSubStrings.at(0) = "";
+			marqueeSubStrings.at(1) = "";
+			marqueeSubStrings.at(2) = "";
+			startingPosition = displayWidth;
+		}
+		else {
+			marqueeSubStrings.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
 			
-			marqueeDisplayLock.lock();
-			if (!marqueeRunning) {
-				marqueeSubStrings.at(0) = std::string(displayWidth, ' ');
-				marqueeSubStrings.at(1) = "";
-				marqueeSubStrings.at(2) = "";
-			}
-			else {
-				marqueeSubStrings.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
-				
-				if (startingPosition > 0)
-				{
-					int difference = displayWidth - startingPosition;
-					if (difference > textLength) {
-						marqueeSubStrings.at(1) = marqueeToPrint;
-						marqueeSubStrings.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
-					}
-					else {
-						marqueeSubStrings.at(1) = marqueeToPrint.substr(0, difference);
-						marqueeSubStrings.at(2) = std::string(displayWidth - difference, ' ');
-					}
+			if (startingPosition > 0)
+			{
+				int difference = displayWidth - startingPosition;
+				if (difference > textLength) {
+					marqueeSubStrings.at(1) = marqueeToPrint;
+					marqueeSubStrings.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
 				}
 				else {
-					marqueeSubStrings.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+					marqueeSubStrings.at(1) = marqueeToPrint.substr(0, difference);
+					marqueeSubStrings.at(2) = std::string(displayWidth - difference, ' ');					
 				}
-
-				startingPosition--;
-
-				// When text disappears
-				if (startingPosition + textLength == 0)
-					startingPosition = displayWidth;
 			}
-			marqueeDisplayLock.unlock();
+			else {
+				marqueeSubStrings.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+			}
 
-			// Sleep
-			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
-			std::this_thread::sleep_for(std::chrono::milliseconds(marqueeSpeed));
-			mainMarqueeLock.unlock();
+			startingPosition--;
 		}
+		marqueeDisplayLock.unlock();
+
+		// When text disappears
+		if (startingPosition + textLength <= 0)
+			startingPosition = displayWidth;
+
+		// Sleep
+		mainMarqueeLock.lock();
+		std::this_thread::sleep_for(std::chrono::milliseconds(marqueeSpeed));
+		mainMarqueeLock.unlock();
 	}
 }
 
 void displayThreadFunction() {
 	const int refresh_rate_ms = 50;
+	const int padding = 15;
 	while (isRunning) {
 
 		// Marquee
-		gotoxy(0, 3);
-		std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
-		//std::cout << marqueeSubStrings.at(3) << std::endl;
-		std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2) << std::endl;
-		//std::cout << marqueeSubStrings.at(3);
-		marqueeDisplayLock.unlock();
+		if (marqueeRunning) {
+			gotoxy(0, 3);
+			std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
+			std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2);
+			marqueeDisplayLock.unlock();
+		}
 
-		// Prompt
-		gotoxy(0, 7);
-		std::unique_lock<std::mutex> mainDisplayLock(mainDisplayMutex);
-		std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
-			      << "Version Date: V225.919";
-		mainDisplayLock.unlock();
+		// Command
+		gotoxy(65, 7);
 
-		gotoxy(0, 10);
+		// One Shot display blocks
+		if (printText) {
+			gotoxy(0, 7);
+			std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
+				<< "Version Date: V225.919";
+
+			printText = false;
+		}
+
+		if (printHelp) {
+			gotoxy(0, 10);
+			std::cout << std::left << std::setw(padding) << "COMMANDS"
+				<< "DESCRIPTION" << std::endl;
+			std::cout << std::left << std::setw(padding) << "help"
+				<< "- displays the commands and its description" << std::endl;
+			std::cout << std::left << std::setw(padding) << "start_marquee"
+				<< "- starts the marquee \"animation\"" << std::endl;
+			std::cout << std::left << std::setw(padding) << "stop_marquee"
+				<< "- stops the marquee \"animations\"" << std::endl;
+			std::cout << std::left << std::setw(padding) << "set_text"
+				<< "- accepts a text input and displays it as a marquee" << std::endl;
+			std::cout << std::left << std::setw(padding) << "set_speed"
+				<< "- set the marquee animation refresh in milliseconds" << std::endl;
+			std::cout << std::left << std::setw(padding) << "exit"
+				<< "- terminate the console";
+			
+			printHelp = false;
+		}
+
+		if (printPrompt) {
+			gotoxy(65, 8);
+			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+			std::cout << systemPromptText;
+			mainMarqueeLock.unlock();
+			printPrompt = false;
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(refresh_rate_ms));
 	}
 }
 
-// --- Main Thread Functions ---
+// --- Command Functions
+void setMarqueeText(std::vector<std::string> tokens) {
+
+	std::string newMarquee = tokens.at(0);
+	tokens.erase(tokens.begin());
+
+	// Concatenate Tokens First
+	for (std::string subString : tokens) {
+		newMarquee.append(" ");
+		newMarquee.append(subString);
+	}
+
+	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+	marqueeText = newMarquee;
+	mainMarqueeLock.unlock();
+}
+
+void setMarqueeSpeed(std::vector<std::string> tokens) {
+
+	size_t speed = std::stoi(tokens.at(0));
+
+	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+	marqueeSpeed = speed;
+	mainMarqueeLock.unlock();
+}
+
+void systemPrompt(std::string prompt) {
+	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+	systemPromptText = prompt;
+	printPrompt = true;
+	mainMarqueeLock.unlock();
+}
+
+// --- Helper Functions ---
 std::vector<std::string> getToken(std::string line) {
 	std::vector<std::string> tokens;
 	std::stringstream SS(line);
@@ -150,12 +218,18 @@ int main() {
 			// Locks
 			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
 			mainMarqueeLock.unlock();
+
+			// Variables
 			std::vector<std::string> commandTokens = getToken(commandLine);
 			std::string fToken = commandTokens.at(0);
+
+			// Remove first token from the vector
 			commandTokens.erase(commandTokens.begin());
 
 			if (fToken == "help") {
-
+				mainMarqueeLock.lock();
+				printHelp = true;
+				mainMarqueeLock.unlock();
 			}
 			else if (fToken == "start_marquee") {
 				mainMarqueeLock.lock();
@@ -168,18 +242,24 @@ int main() {
 				mainMarqueeLock.unlock();
 			}
 			else if (fToken == "set_text") {
-				
+
+				if (marqueeRunning)
+					systemPrompt("ERROR: Marquee is still running.");
+				else
+					setMarqueeText(commandTokens);
 			}
 			else if (fToken == "set_speed") {
-
+				setMarqueeSpeed(commandTokens);
 			}
 			else if (fToken == "exit") {
-				clearScreen();
 				isRunning = false;
+				clearScreen();
 			}
 			else {
-				// Call prompt here
 				clearScreen();
+				mainMarqueeLock.lock();
+				printText = true;
+				mainMarqueeLock.unlock();
 			}
 		}
 		
