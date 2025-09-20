@@ -1,41 +1,5 @@
 #include "gHeader.hpp"
 
-// --- Shared State and Thread Control ---
-// Global flat to signal all threads to exit
-std::string marqueeText = "[CSOPESY] Marquee Console";
-std::atomic<bool> isRunning{ true };
-std::atomic<bool> marqueeRunning{ true };
-
-// The command interpreter and display thread share this variable
-std::string promptDisplayBuffer = "";
-std::mutex promptMutex;
-
-// Shared state for the keyboard handler and command interpreter
-std::queue<std::string> commandQueue;
-std::mutex commandQueueMutex;
-
-// The marquee logic thread and display thread share this variable
-std::vector<std::string> marqueeSubStrings = { "", "", "", "" };
-std::string marqueeDisplayBuffer = "";
-std::mutex marqueeDisplayMutex;
-
-// The main thread and marquee logic thread share this variable
-std::string systemPromptText = "";
-std::mutex mainMarqueeMutex;
-std::atomic<bool> printHelp{ false };
-std::atomic<bool> printText{ true };
-std::atomic<bool> printPrompt{ false };
-size_t marqueeSpeed = 200;
-
-// The main thread and display logic thread share this variable
-std::mutex mainDisplayMutex;
-
-// --- Thread Functions ---
-void displayCommandLogicFunction() {
-
-}
-
-
 // --- Main Function (Command Interpreter Thread) ---
 int main() {
 	// Start the three worker threads.
@@ -76,31 +40,36 @@ int main() {
 				mainMarqueeLock.lock();
 				marqueeRunning = true;
 				mainMarqueeLock.unlock();
+				restartDisplay();
+				systemPrompt("NOTICE: Marquee animation has started.");
 			}
 			else if (fToken == "stop_marquee") {
 				mainMarqueeLock.lock();
 				marqueeRunning = false;
 				mainMarqueeLock.unlock();
+				restartDisplay();
+				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}
 			else if (fToken == "set_text") {
-
 				if (marqueeRunning)
 					systemPrompt("ERROR: Marquee is still running.");
-				else
+				else {
 					setMarqueeText(commandTokens);
+					restartDisplay();
+					systemPrompt("NOTICE: Marquee text has been edited.");
+				}
 			}
 			else if (fToken == "set_speed") {
 				setMarqueeSpeed(commandTokens);
+				restartDisplay();
+				systemPrompt("NOTICE: Marquee speed has been edited.");
 			}
 			else if (fToken == "exit") {
 				isRunning = false;
 				clearScreen();
 			}
 			else {
-				clearScreen();
-				mainMarqueeLock.lock();
-				printText = true;
-				mainMarqueeLock.unlock();
+				restartDisplay();
 				systemPrompt("ERROR: Command is not recognized.");
 			}
 		}

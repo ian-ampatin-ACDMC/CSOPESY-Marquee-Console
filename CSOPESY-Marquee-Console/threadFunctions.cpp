@@ -71,7 +71,6 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 void displayThreadFunction() {
 	const int refresh_rate_ms = 50;
-	const int padding = 15;
 	while (isRunning) {
 
 		// Marquee
@@ -96,21 +95,7 @@ void displayThreadFunction() {
 
 		if (printHelp) {
 			gotoxy(0, 10);
-			std::cout << std::left << std::setw(padding) << "COMMANDS"
-				<< "DESCRIPTION" << std::endl;
-			std::cout << std::left << std::setw(padding) << "help"
-				<< "- displays the commands and its description" << std::endl;
-			std::cout << std::left << std::setw(padding) << "start_marquee"
-				<< "- starts the marquee \"animation\"" << std::endl;
-			std::cout << std::left << std::setw(padding) << "stop_marquee"
-				<< "- stops the marquee \"animations\"" << std::endl;
-			std::cout << std::left << std::setw(padding) << "set_text"
-				<< "- accepts a text input and displays it as a marquee" << std::endl;
-			std::cout << std::left << std::setw(padding) << "set_speed"
-				<< "- set the marquee animation refresh in milliseconds" << std::endl;
-			std::cout << std::left << std::setw(padding) << "exit"
-				<< "- terminate the console";
-
+			printHelpFunction();
 			printHelp = false;
 		}
 

@@ -48,6 +48,8 @@ extern std::mutex mainDisplayMutex;
 // --- Utility Functions ---
 void clearScreen();
 void gotoxy(int x, int y);
+void printHelpFunction();
+void restartDisplay();
 std::vector<std::string> getToken(std::string line);
 
 // --- Thread Function --- 

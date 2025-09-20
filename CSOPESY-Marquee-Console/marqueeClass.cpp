@@ -1,6 +1,0 @@
-class Marquee {
-private:
-
-public:
-
-};

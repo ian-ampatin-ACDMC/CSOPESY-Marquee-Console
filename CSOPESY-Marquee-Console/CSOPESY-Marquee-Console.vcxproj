@@ -124,10 +124,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="marqueeClass.cpp" />
     <ClCompile Include="commandFunctions.cpp" />
     <ClCompile Include="threadFunctions.cpp" />
     <ClCompile Include="utilityFunctions.cpp" />
+    <ClCompile Include="variables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gHeader.hpp" />
