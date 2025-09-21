@@ -10,7 +10,7 @@ int main() {
 	std::cout.flush();
 
 	// Start the three worker threads.
-	std::thread marqueeLogicThread(marqueeLogicThreadFunction, 60);
+	std::thread marqueeLogicThread(marqueeLogicThreadFunction, lengthOfDisplay);
 	std::thread displayThread(displayThreadFunction);
 	std::thread keyboardHandlerThread(keyboardHandlerThreadFunction);
 
@@ -39,7 +39,7 @@ int main() {
 			commandTokens.erase(commandTokens.begin());
 
 			// Restart the display screen
-			restartDisplay();
+			clearScreen();
 
 			// Command Logic
 			if (fToken == "help") {
@@ -57,6 +57,7 @@ int main() {
 				mainMarqueeLock.lock();
 				marqueeRunning = false;
 				mainMarqueeLock.unlock();
+				clearScreen();
 				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}
 			else if (fToken == "set_text") {
@@ -82,7 +83,7 @@ int main() {
 
 	// Exit message
 	clearScreen();
-	std::cout << "THANK YOU FOR USING THE MARQUEE" << std::endl;
+	std::cout << "Program has been terminated." << std::endl;
 
 	// Join threads to ensure the finish cleanly.
 	if (marqueeLogicThread.joinable())

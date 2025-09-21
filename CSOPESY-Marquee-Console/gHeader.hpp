@@ -20,8 +20,9 @@
 extern std::string marqueeText;
 extern std::atomic<bool> isRunning;
 extern std::atomic<bool> marqueeRunning;
-extern size_t xCoordinateCommand;
-extern size_t yCoordinateCommand;
+extern int xCoordinateCommand;
+extern int yCoordinateCommand;
+extern int lengthOfDisplay;
 
 // The command interpreter and display thread share this variable
 extern std::string promptDisplayBuffer;
@@ -55,7 +56,6 @@ extern std::vector<std::vector<std::string>> registeredCommands;
 void clearScreen();
 void gotoxy(int x, int y);
 void printHelpFunction();
-void restartDisplay();
 void disableEcho();
 void enableEcho();
 std::vector<std::string> getToken(std::string line);

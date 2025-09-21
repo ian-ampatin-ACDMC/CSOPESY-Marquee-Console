@@ -29,8 +29,13 @@ std::vector<std::string> getToken(std::string line) {
 
 // Print the commands that are recognized by the program
 void printHelpFunction() {
-	size_t padding = 20;
+	int padding = 20;
+	int descriptionSpace = lengthOfDisplay - padding;
+	size_t consumedSpace;
+	std::string token;
 
+	std::atomic<bool> firstElement;
+	std::vector<std::string> stringTokens;
 	std::unique_lock<std::mutex> mainDisplayLock(mainDisplayMutex);
 	std::vector<std::vector<std::string>> commandList = registeredCommands;
 	mainDisplayLock.unlock();
@@ -42,18 +47,40 @@ void printHelpFunction() {
 	commandList.push_back({"set_speed", "- set the marquee animation refresh in milliseconds"});
 	commandList.push_back({"exit", "- terminate the console"});
 
+	std::cout << std::string(lengthOfDisplay, '-') << std::endl;
 	std::cout << std::left << std::setw(padding) << "COMMANDS" << "DESCRIPTION" << std::endl;
-	for (std::vector<std::string> command : commandList) {
-		std::cout << std::left << std::setw(padding) << command.at(0) << command.at(1) << std::endl;
-	}
-}
+	std::cout << std::string(lengthOfDisplay, '-') << std::endl;
 
-// Reset the variables to clean up the display
-void restartDisplay() {
-	clearScreen();
-	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
-	mainMarqueeLock.unlock();
-	systemPrompt("");
+	for (std::vector<std::string> command : commandList) {
+		stringTokens = getToken(command.at(1));
+		std::cout << std::left << std::setw(padding) << command.at(0); // << command.at(1) << std::endl;
+		
+		// Print Description
+		firstElement = true;
+		consumedSpace = 0;
+		while (!stringTokens.empty()) {
+			token = stringTokens.at(0);
+			consumedSpace += token.length() + 1;
+
+			if (consumedSpace <= descriptionSpace) {
+				
+				if (firstElement) {
+					std::cout << token;
+					firstElement = false;
+				}
+				else
+					std::cout << " " << token;
+			}
+			else {
+				std::cout << std::endl << std::left << std::setw(padding) << "" << "  " << token;
+				consumedSpace = 0;
+			}
+
+			stringTokens.erase(stringTokens.begin());
+		}
+		
+		std::cout << std::endl;
+	}
 }
 
 void disableEcho() {

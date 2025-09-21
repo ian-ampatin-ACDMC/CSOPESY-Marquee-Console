@@ -5,8 +5,9 @@
 std::string marqueeText = "[CSOPESY] Marquee Console";
 std::atomic<bool> isRunning{ true };
 std::atomic<bool> marqueeRunning{ true };
-size_t xCoordinateCommand = 65;
-size_t yCoordinateCommand = 7;
+int xCoordinateCommand = 65;
+int yCoordinateCommand = 7;
+int lengthOfDisplay = 60;
 
 // The command interpreter and display thread share this variable
 std::string promptDisplayBuffer = "";

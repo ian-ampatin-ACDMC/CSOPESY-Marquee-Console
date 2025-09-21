@@ -47,8 +47,6 @@ void keyboardHandlerThreadFunction() {
 			enterKeyPressed = false;
 			commandLine = "";
 		}
-
-		//std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	}
 }
 
@@ -63,7 +61,7 @@ void marqueeLogicThreadFunction(int displayWidth) {
 		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
 		size_t textLength = marqueeText.length();
 		std::string marqueeToPrint = marqueeText;
-		int speed = marqueeSpeed;
+		size_t speed = marqueeSpeed;
 		mainMarqueeLock.unlock();
 
 		if (!marqueeRunning) {
@@ -83,6 +81,7 @@ void marqueeLogicThreadFunction(int displayWidth) {
 				if (difference >= textLength) {
 					marqueeSubString.at(1) = marqueeToPrint;
 					marqueeSubString.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
+					//marqueeSubString.at(2) = (difference == 0) ? "" : " ";
 				}
 				else {
 					marqueeSubString.at(1) = marqueeToPrint.substr(0, difference);
@@ -108,7 +107,7 @@ void marqueeLogicThreadFunction(int displayWidth) {
 }
 
 void displayThreadFunction() {
-	const int refresh_rate_ms = 50;
+	const int refresh_rate_ms = 10;
 	while (isRunning) {
 
 		// Marquee
@@ -145,11 +144,11 @@ void displayThreadFunction() {
 		std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex);
 		if (backspacePressed) {
 			gotoxy(xCoordinateCommand, yCoordinateCommand);
-			std::cout << std::string(displayCommand.length() + 3, ' ');
+			std::cout << "Command > " << std::string(displayCommand.length() + 1, ' ');
 			backspacePressed = false;
 		}
 		gotoxy(xCoordinateCommand, yCoordinateCommand);
-		std::cout << displayCommand;
+		std::cout << "Command > " << displayCommand;
 		keyboardDisplayLock.unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(refresh_rate_ms));

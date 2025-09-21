@@ -28,18 +28,22 @@ void setMarqueeSpeed(std::vector<std::string> tokens) {
 		systemPrompt("ERROR: set_speed command is missing parameters.");
 	}
 	else {
-		size_t speed = std::stoi(tokens.at(0));
+		int speed = std::stoi(tokens.at(0));
 
-		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
-		marqueeSpeed = speed;
-		mainMarqueeLock.unlock();
-		systemPrompt("NOTICE: Marquee animation speed has been edited.");
+		if (speed < 0)
+			systemPrompt("ERROR: set_speed cannot take a negative paramter.");
+		else {
+			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+			marqueeSpeed = speed;
+			mainMarqueeLock.unlock();
+			systemPrompt("NOTICE: Marquee animation speed has been edited.");
+		}
 	}
 }
 
 void systemPrompt(std::string prompt) {
-	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+	std::unique_lock<std::mutex> promptLock(promptMutex);
 	systemPromptText = prompt;
 	printPrompt = true;
-	mainMarqueeLock.unlock();
+	promptLock.unlock();
 }
