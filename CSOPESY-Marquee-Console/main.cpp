@@ -2,6 +2,13 @@
 
 // --- Main Function (Command Interpreter Thread) ---
 int main() {
+	// Disable echo
+	disableEcho();
+
+	// Hide the cursor
+	std::cout << "\x1b[?25l"; 
+	std::cout.flush();
+
 	// Start the three worker threads.
 	std::thread marqueeLogicThread(marqueeLogicThreadFunction, 60);
 	std::thread displayThread(displayThreadFunction);
@@ -31,6 +38,10 @@ int main() {
 			// Remove first token from the vector
 			commandTokens.erase(commandTokens.begin());
 
+			// Restart the display screen
+			restartDisplay();
+
+			// Command Logic
 			if (fToken == "help") {
 				mainMarqueeLock.lock();
 				printHelp = true;
@@ -40,14 +51,12 @@ int main() {
 				mainMarqueeLock.lock();
 				marqueeRunning = true;
 				mainMarqueeLock.unlock();
-				restartDisplay();
 				systemPrompt("NOTICE: Marquee animation has started.");
 			}
 			else if (fToken == "stop_marquee") {
 				mainMarqueeLock.lock();
 				marqueeRunning = false;
 				mainMarqueeLock.unlock();
-				restartDisplay();
 				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}
 			else if (fToken == "set_text") {
@@ -55,27 +64,25 @@ int main() {
 					systemPrompt("ERROR: Marquee is still running.");
 				else {
 					setMarqueeText(commandTokens);
-					restartDisplay();
-					systemPrompt("NOTICE: Marquee text has been edited.");
 				}
 			}
 			else if (fToken == "set_speed") {
 				setMarqueeSpeed(commandTokens);
-				restartDisplay();
-				systemPrompt("NOTICE: Marquee speed has been edited.");
 			}
 			else if (fToken == "exit") {
 				isRunning = false;
-				clearScreen();
 			}
 			else {
-				restartDisplay();
 				systemPrompt("ERROR: Command is not recognized.");
 			}
 		}
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
+
+	// Exit message
+	clearScreen();
+	std::cout << "THANK YOU FOR USING THE MARQUEE" << std::endl;
 
 	// Join threads to ensure the finish cleanly.
 	if (marqueeLogicThread.joinable())
@@ -87,8 +94,8 @@ int main() {
 	if (keyboardHandlerThread.joinable())
 		keyboardHandlerThread.join();
 
-	clearScreen();
-	std::cout << "THANK YOU FOR USING THE MARQUEE" << std::endl;
+	// Re-enable echo
+	enableEcho();
 
 	return 0;
 }

@@ -20,6 +20,8 @@
 extern std::string marqueeText;
 extern std::atomic<bool> isRunning;
 extern std::atomic<bool> marqueeRunning;
+extern size_t xCoordinateCommand;
+extern size_t yCoordinateCommand;
 
 // The command interpreter and display thread share this variable
 extern std::string promptDisplayBuffer;
@@ -30,26 +32,32 @@ extern std::queue<std::string> commandQueue;
 extern std::mutex commandQueueMutex;
 
 // The marquee logic thread and display thread share this variable
-extern std::vector<std::string> marqueeSubStrings;
-extern std::string marqueeDisplayBuffer;
+extern std::string displayMarquee;
 extern std::mutex marqueeDisplayMutex;
+
+// The keyboard handler thread and the display thread share this variable
+extern std::string displayCommand;
+extern std::mutex keyboardDisplayMutex;
+extern std::atomic<bool> backspacePressed;
 
 // The main thread and marquee logic thread share this variable
 extern std::string systemPromptText;
 extern std::mutex mainMarqueeMutex;
 extern std::atomic<bool> printHelp;
-extern std::atomic<bool> printText;
 extern std::atomic<bool> printPrompt;
 extern size_t marqueeSpeed;
 
 // The main thread and display logic thread share this variable
 extern std::mutex mainDisplayMutex;
+extern std::vector<std::vector<std::string>> registeredCommands;
 
 // --- Utility Functions ---
 void clearScreen();
 void gotoxy(int x, int y);
 void printHelpFunction();
 void restartDisplay();
+void disableEcho();
+void enableEcho();
 std::vector<std::string> getToken(std::string line);
 
 // --- Thread Function --- 

@@ -1,15 +1,54 @@
 #include "gHeader.hpp"
 
 void keyboardHandlerThreadFunction() {
-	std::string commandLine;
-	while (isRunning) {
-		std::getline(std::cin, commandLine);
+	std::string commandLine = "";
+	std::atomic<bool> enterKeyPressed = false;
 
-		if (!commandLine.empty()) {
-			std::unique_lock<std::mutex> lock(commandQueueMutex);
-			commandQueue.push(commandLine);
-			lock.unlock();
+	char key;
+
+	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
+
+	while (isRunning) {
+		key = _getch();
+
+		if (key == '\n' || key == '\r') {
+			enterKeyPressed = true;
 		}
+		else if (key == 8) {
+			if (!commandLine.empty())
+				commandLine.pop_back();
+
+			keyboardDisplayLock.lock();
+			if (!displayCommand.empty()) {
+				displayCommand.pop_back();
+				backspacePressed = true;
+			}
+			keyboardDisplayLock.unlock();
+		}
+		else {
+			commandLine += key;
+
+			keyboardDisplayLock.lock();
+			displayCommand += key;
+			keyboardDisplayLock.unlock();
+		}
+
+		if (enterKeyPressed) {
+
+			if (!commandLine.empty()) {
+				std::unique_lock<std::mutex> lock(commandQueueMutex);
+				commandQueue.push(commandLine);
+				lock.unlock();
+			}
+
+			keyboardDisplayLock.lock();
+			displayCommand = "";
+			keyboardDisplayLock.unlock();
+			enterKeyPressed = false;
+			commandLine = "";
+		}
+
+		//std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	}
 }
 
@@ -17,55 +56,54 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 	int startingPosition = displayWidth;
 
-	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
-	marqueeSubStrings.at(3) = std::string(displayWidth, '-');
-	marqueeDisplayLock.unlock();
+	std::vector<std::string> marqueeSubString = { "", "", "" };
+	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
 
 	while (isRunning) {
 		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
 		size_t textLength = marqueeText.length();
 		std::string marqueeToPrint = marqueeText;
+		int speed = marqueeSpeed;
 		mainMarqueeLock.unlock();
 
-		marqueeDisplayLock.lock();
 		if (!marqueeRunning) {
+			marqueeDisplayLock.lock();
 			//marqueeSubStrings.at(0) = std::string(displayWidth, ' ');
-			marqueeSubStrings.at(0) = "";
-			marqueeSubStrings.at(1) = "";
-			marqueeSubStrings.at(2) = "";
+			displayMarquee = "";
+			marqueeDisplayLock.unlock();
 			startingPosition = displayWidth;
 		}
 		else {
-			marqueeSubStrings.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
+			marqueeDisplayLock.lock();
+			marqueeSubString.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
 
 			if (startingPosition > 0)
 			{
-				int difference = displayWidth - startingPosition;
-				if (difference > textLength) {
-					marqueeSubStrings.at(1) = marqueeToPrint;
-					marqueeSubStrings.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
+				int difference = displayWidth - (startingPosition < 0 ? 0 : startingPosition);
+				if (difference >= textLength) {
+					marqueeSubString.at(1) = marqueeToPrint;
+					marqueeSubString.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
 				}
 				else {
-					marqueeSubStrings.at(1) = marqueeToPrint.substr(0, difference);
-					marqueeSubStrings.at(2) = std::string(displayWidth - difference, ' ');
+					marqueeSubString.at(1) = marqueeToPrint.substr(0, difference);
+					//marqueeSubString.at(2) = std::string(displayWidth - difference, ' ');
+					marqueeSubString.at(2) = "";
 				}
 			}
 			else {
-				marqueeSubStrings.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+				marqueeSubString.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
 			}
-
+			displayMarquee = marqueeSubString.at(0) + marqueeSubString.at(1) + marqueeSubString.at(2);
+			marqueeDisplayLock.unlock();
 			startingPosition--;
 		}
-		marqueeDisplayLock.unlock();
 
 		// When text disappears
 		if (startingPosition + textLength <= 0)
 			startingPosition = displayWidth;
 
 		// Sleep
-		mainMarqueeLock.lock();
-		std::this_thread::sleep_for(std::chrono::milliseconds(marqueeSpeed));
-		mainMarqueeLock.unlock();
+		std::this_thread::sleep_for(std::chrono::milliseconds(speed));
 	}
 }
 
@@ -77,28 +115,24 @@ void displayThreadFunction() {
 		if (marqueeRunning) {
 			gotoxy(0, 3);
 			std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
-			std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2);
+			//std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2);
+			std::cout << displayMarquee;
 			marqueeDisplayLock.unlock();
 		}
 
-		// Command
-		gotoxy(65, 7);
+		// Basic Information of the Project
+		gotoxy(0, 7);
+		std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
+			<< "Version Date: V225.919";
 
-		// One Shot display blocks
-		if (printText) {
-			gotoxy(0, 7);
-			std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
-				<< "Version Date: V225.919";
-
-			printText = false;
-		}
-
+		// Print the contents for the help command
 		if (printHelp) {
 			gotoxy(0, 10);
 			printHelpFunction();
 			printHelp = false;
 		}
 
+		// One shot print blocks
 		if (printPrompt) {
 			gotoxy(65, 8);
 			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
@@ -106,6 +140,17 @@ void displayThreadFunction() {
 			mainMarqueeLock.unlock();
 			printPrompt = false;
 		}
+
+		// Display what the user is typing
+		std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex);
+		if (backspacePressed) {
+			gotoxy(xCoordinateCommand, yCoordinateCommand);
+			std::cout << std::string(displayCommand.length() + 3, ' ');
+			backspacePressed = false;
+		}
+		gotoxy(xCoordinateCommand, yCoordinateCommand);
+		std::cout << displayCommand;
+		keyboardDisplayLock.unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(refresh_rate_ms));
 	}

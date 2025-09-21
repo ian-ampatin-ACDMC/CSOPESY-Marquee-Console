@@ -5,6 +5,8 @@
 std::string marqueeText = "[CSOPESY] Marquee Console";
 std::atomic<bool> isRunning{ true };
 std::atomic<bool> marqueeRunning{ true };
+size_t xCoordinateCommand = 65;
+size_t yCoordinateCommand = 7;
 
 // The command interpreter and display thread share this variable
 std::string promptDisplayBuffer = "";
@@ -15,17 +17,21 @@ std::queue<std::string> commandQueue;
 std::mutex commandQueueMutex;
 
 // The marquee logic thread and display thread share this variable
-std::vector<std::string> marqueeSubStrings = { "", "", "", "" };
-std::string marqueeDisplayBuffer = "";
+std::string displayMarquee = "";
 std::mutex marqueeDisplayMutex;
+
+// The keyboard handler thread and the display thread share this variable
+std::string displayCommand = "";
+std::mutex keyboardDisplayMutex;
+std::atomic<bool> backspacePressed{ false };
 
 // The main thread and marquee logic thread share this variable
 std::string systemPromptText = "";
 std::mutex mainMarqueeMutex;
 std::atomic<bool> printHelp{ false };
-std::atomic<bool> printText{ true };
 std::atomic<bool> printPrompt{ false };
 size_t marqueeSpeed = 200;
 
 // The main thread and display logic thread share this variable
 std::mutex mainDisplayMutex;
+std::vector<std::vector<std::string>> registeredCommands;
