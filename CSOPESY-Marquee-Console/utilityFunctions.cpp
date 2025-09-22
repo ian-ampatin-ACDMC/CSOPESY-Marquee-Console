@@ -5,7 +5,7 @@ void clearScreen() {
 	#ifdef _WIN32
 		system("cls");
 	#else
-		system("clear");	
+		system("clear");
 	#endif
 }
 
@@ -30,7 +30,7 @@ void printHelpFunction() {
 
 	commandList.push_back({"help", "- display the commands and their decription"});
 	commandList.push_back({"start_marquee", "- starts the marquee \"animation\""});
-	commandList.push_back({"stop_marquee", "- stops the marquee \"animations\""});
+	commandList.push_back({"stop_marquee", "- stops the marquee \"animation\""});
 	commandList.push_back({"set_text", "- accepts a text input and displays it as a marquee"});
 	commandList.push_back({"set_speed", "- set the marquee animation refresh in milliseconds"});
 	commandList.push_back({"exit", "- terminate the console"});
@@ -44,24 +44,20 @@ void printHelpFunction() {
 		std::cout << std::left << std::setw(padding) << command.at(0); // << command.at(1) << std::endl;
 		
 		// Print Description
-		firstElement = true;
 		consumedSpace = 0;
+		std::cout << stringTokens.at(0);
+		consumedSpace += stringTokens.at(0).length();
+		stringTokens.erase(stringTokens.begin());
 		while (!stringTokens.empty()) {
 			token = stringTokens.at(0);
 			consumedSpace += token.length() + 1;
 
 			if (consumedSpace <= descriptionSpace) {
-				
-				if (firstElement) {
-					std::cout << token;
-					firstElement = false;
-				}
-				else
-					std::cout << " " << token;
+				std::cout << " " << token;
 			}
 			else {
 				std::cout << std::endl << std::left << std::setw(padding) << "" << "  " << token;
-				consumedSpace = 0;
+				consumedSpace = 2 + token.length();
 			}
 
 			stringTokens.erase(stringTokens.begin());

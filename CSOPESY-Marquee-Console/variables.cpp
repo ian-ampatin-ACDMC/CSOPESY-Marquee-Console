@@ -31,7 +31,7 @@ std::string systemPromptText = "";
 std::mutex mainMarqueeMutex;
 std::atomic<bool> printHelp{ false };
 std::atomic<bool> printPrompt{ false };
-size_t marqueeSpeed = 200;
+size_t marqueeSpeed = 100;
 
 // The main thread and display logic thread share this variable
 std::mutex mainDisplayMutex;

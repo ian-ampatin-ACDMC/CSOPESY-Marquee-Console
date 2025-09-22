@@ -41,11 +41,11 @@ void keyboardHandlerThreadFunction() {
 				lock.unlock();
 			}
 
+			commandLine = "";
 			keyboardDisplayLock.lock();
 			displayCommand = "";
 			keyboardDisplayLock.unlock();
 			enterKeyPressed = false;
-			commandLine = "";
 		}
 	}
 }
@@ -56,12 +56,17 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 	std::vector<std::string> marqueeSubString = { "", "", "" };
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
+	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex, std::defer_lock);
+
+	std::string marqueeToPrint;
+	size_t textLength;
+	size_t speed;
 
 	while (isRunning) {
-		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
-		size_t textLength = marqueeText.length();
-		std::string marqueeToPrint = marqueeText;
-		size_t speed = marqueeSpeed;
+		mainMarqueeLock.lock();
+		marqueeToPrint = marqueeText;
+		textLength = marqueeText.length();
+		speed = marqueeSpeed;
 		mainMarqueeLock.unlock();
 
 		if (!marqueeRunning) {
@@ -72,16 +77,14 @@ void marqueeLogicThreadFunction(int displayWidth) {
 			startingPosition = displayWidth;
 		}
 		else {
-			marqueeDisplayLock.lock();
 			marqueeSubString.at(0) = std::string(startingPosition <= 0 ? 0 : startingPosition, ' ');
 
-			if (startingPosition > 0)
+			if (startingPosition >= 0)
 			{
 				int difference = displayWidth - (startingPosition < 0 ? 0 : startingPosition);
-				if (difference >= textLength) {
+				if (difference > textLength) {
 					marqueeSubString.at(1) = marqueeToPrint;
 					marqueeSubString.at(2) = std::string(displayWidth - (startingPosition + textLength), ' ');
-					//marqueeSubString.at(2) = (difference == 0) ? "" : " ";
 				}
 				else {
 					marqueeSubString.at(1) = marqueeToPrint.substr(0, difference);
@@ -90,10 +93,17 @@ void marqueeLogicThreadFunction(int displayWidth) {
 				}
 			}
 			else {
-				marqueeSubString.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+				if (abs(startingPosition) > textLength)
+					startingPosition = displayWidth;
+				else
+					marqueeSubString.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
+				//marqueeSubString.at(1) = marqueeToPrint;
 			}
+
+			marqueeDisplayLock.lock();
 			displayMarquee = marqueeSubString.at(0) + marqueeSubString.at(1) + marqueeSubString.at(2);
 			marqueeDisplayLock.unlock();
+
 			startingPosition--;
 		}
 
@@ -107,7 +117,7 @@ void marqueeLogicThreadFunction(int displayWidth) {
 }
 
 void displayThreadFunction() {
-	const int refresh_rate_ms = 10;
+	const int refreshRate = 50;
 
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
 	std::unique_lock<std::mutex> promptLock(promptMutex, std::defer_lock);
@@ -155,6 +165,6 @@ void displayThreadFunction() {
 		std::cout << "Command > " << displayCommand;
 		keyboardDisplayLock.unlock();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(refresh_rate_ms));
+		std::this_thread::sleep_for(std::chrono::milliseconds(refreshRate));
 	}
 }

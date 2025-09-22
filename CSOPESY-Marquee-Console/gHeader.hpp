@@ -71,5 +71,4 @@ void setMarqueeText(std::vector<std::string> tokens);
 void setMarqueeSpeed(std::vector<std::string> tokens);
 void systemPrompt(std::string prompt);
 
-
 #endif GHEADER

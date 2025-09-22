@@ -61,11 +61,7 @@ int main() {
 				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}
 			else if (fToken == "set_text") {
-				if (marqueeRunning)
-					systemPrompt("ERROR: Marquee is still running.");
-				else {
-					setMarqueeText(commandTokens);
-				}
+				setMarqueeText(commandTokens);
 			}
 			else if (fToken == "set_speed") {
 				setMarqueeSpeed(commandTokens);

@@ -123,7 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="commandInterpreter.cpp" />
     <ClCompile Include="commandFunctions.cpp" />
     <ClCompile Include="threadFunctions.cpp" />
     <ClCompile Include="utilityFunctions.cpp" />
