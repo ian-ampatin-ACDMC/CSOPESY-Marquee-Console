@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <conio.h>
 #include <Windows.h>
+#include <stdexcept>
 
 // --- Shared State and Thread Control ---
 // Global flat to signal all threads to exit

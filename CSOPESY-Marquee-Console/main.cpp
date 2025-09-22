@@ -85,6 +85,9 @@ int main() {
 	clearScreen();
 	std::cout << "Program has been terminated." << std::endl;
 
+	// Re-enable echo
+	enableEcho();
+
 	// Join threads to ensure the finish cleanly.
 	if (marqueeLogicThread.joinable())
 		marqueeLogicThread.join();
@@ -94,9 +97,6 @@ int main() {
 
 	if (keyboardHandlerThread.joinable())
 		keyboardHandlerThread.join();
-
-	// Re-enable echo
-	enableEcho();
 
 	return 0;
 }

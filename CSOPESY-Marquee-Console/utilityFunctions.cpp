@@ -15,18 +15,6 @@ void gotoxy(int x, int y) {
 	std::cout.flush();
 }
 
-// Tokenize a string
-std::vector<std::string> getToken(std::string line) {
-	std::vector<std::string> tokens;
-	std::stringstream SS(line);
-	std::string collector;
-
-	while (getline(SS, collector, ' '))
-		tokens.push_back(collector);
-
-	return tokens;
-}
-
 // Print the commands that are recognized by the program
 void printHelpFunction() {
 	int padding = 20;
@@ -48,7 +36,7 @@ void printHelpFunction() {
 	commandList.push_back({"exit", "- terminate the console"});
 
 	std::cout << std::string(lengthOfDisplay, '-') << std::endl;
-	std::cout << std::left << std::setw(padding) << "COMMANDS" << "DESCRIPTION" << std::endl;
+	std::cout << std::left << std::setw(padding) << "COMMAND" << "DESCRIPTION" << std::endl;
 	std::cout << std::string(lengthOfDisplay, '-') << std::endl;
 
 	for (std::vector<std::string> command : commandList) {
@@ -95,4 +83,16 @@ void enableEcho() {
 	HANDLE handler = GetStdHandle(STD_INPUT_HANDLE);
 	GetConsoleMode(handler, &mode);
 	SetConsoleMode(handler, mode | ENABLE_ECHO_INPUT);
+}
+
+// Tokenize a string
+std::vector<std::string> getToken(std::string line) {
+	std::vector<std::string> tokens;
+	std::stringstream SS(line);
+	std::string collector;
+
+	while (getline(SS, collector, ' '))
+		tokens.push_back(collector);
+
+	return tokens;
 }

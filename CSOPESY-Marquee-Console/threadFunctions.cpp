@@ -108,12 +108,16 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 void displayThreadFunction() {
 	const int refresh_rate_ms = 10;
+
+	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
+	std::unique_lock<std::mutex> promptLock(promptMutex, std::defer_lock);
+	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
 	while (isRunning) {
 
 		// Marquee
 		if (marqueeRunning) {
 			gotoxy(0, 3);
-			std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex);
+			marqueeDisplayLock.lock();
 			//std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2);
 			std::cout << displayMarquee;
 			marqueeDisplayLock.unlock();
@@ -121,8 +125,8 @@ void displayThreadFunction() {
 
 		// Basic Information of the Project
 		gotoxy(0, 7);
-		std::cout << "Developer: Ampatin, Ian Kenneth" << std::endl
-			<< "Version Date: V225.919";
+		std::cout << "Marquee Console for CSOPESY." << std::endl
+			<< "Version Date: 2025.09.22";
 
 		// Print the contents for the help command
 		if (printHelp) {
@@ -134,14 +138,14 @@ void displayThreadFunction() {
 		// One shot print blocks
 		if (printPrompt) {
 			gotoxy(65, 8);
-			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+			promptLock.lock();
 			std::cout << systemPromptText;
-			mainMarqueeLock.unlock();
+			promptLock.unlock();
 			printPrompt = false;
 		}
 
 		// Display what the user is typing
-		std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex);
+		keyboardDisplayLock.lock();
 		if (backspacePressed) {
 			gotoxy(xCoordinateCommand, yCoordinateCommand);
 			std::cout << "Command > " << std::string(displayCommand.length() + 1, ' ');
