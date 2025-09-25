@@ -59,8 +59,8 @@ void marqueeLogicThreadFunction(int displayWidth) {
 	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex, std::defer_lock);
 
 	std::string marqueeToPrint;
-	size_t textLength;
-	size_t speed;
+	int textLength;
+	int speed;
 
 	while (isRunning) {
 		mainMarqueeLock.lock();
@@ -93,11 +93,12 @@ void marqueeLogicThreadFunction(int displayWidth) {
 				}
 			}
 			else {
-				if (abs(startingPosition) > textLength)
+				if (abs(startingPosition) >= textLength)
 					startingPosition = displayWidth;
 				else
 					marqueeSubString.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
-				//marqueeSubString.at(1) = marqueeToPrint;
+
+				//marqueeSubString.at(1) = "Starting Position: " + std::to_string(startingPosition) + " | Condition : " + std::to_string(startingPosition + textLength);
 			}
 
 			marqueeDisplayLock.lock();
@@ -105,7 +106,7 @@ void marqueeLogicThreadFunction(int displayWidth) {
 			marqueeDisplayLock.unlock();
 
 			startingPosition--;
-		}
+		}   
 
 		// When text disappears
 		if (startingPosition + textLength <= 0)
@@ -117,8 +118,6 @@ void marqueeLogicThreadFunction(int displayWidth) {
 }
 
 void displayThreadFunction() {
-	const int refreshRate = 50;
-
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
 	std::unique_lock<std::mutex> promptLock(promptMutex, std::defer_lock);
 	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);

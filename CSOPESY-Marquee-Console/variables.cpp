@@ -8,6 +8,7 @@ std::atomic<bool> marqueeRunning{ true };
 int xCoordinateCommand = 65;
 int yCoordinateCommand = 7;
 int lengthOfDisplay = 60;
+size_t refreshRate = 50;
 
 // The command interpreter and display thread share this variable
 std::string promptDisplayBuffer = "";

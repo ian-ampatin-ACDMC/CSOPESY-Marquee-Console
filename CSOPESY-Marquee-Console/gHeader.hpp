@@ -24,6 +24,7 @@ extern std::atomic<bool> marqueeRunning;
 extern int xCoordinateCommand;
 extern int yCoordinateCommand;
 extern int lengthOfDisplay;
+extern size_t refreshRate;
 
 // The command interpreter and display thread share this variable
 extern std::string promptDisplayBuffer;
