@@ -24,9 +24,9 @@ void printHelpFunction() {
 
 	std::atomic<bool> firstElement;
 	std::vector<std::string> stringTokens;
-	std::unique_lock<std::mutex> mainDisplayLock(mainDisplayMutex);
+	std::unique_lock<std::mutex> commandDisplayLock(commandDisplayMutex);
 	std::vector<std::vector<std::string>> commandList = registeredCommands;
-	mainDisplayLock.unlock();
+	commandDisplayLock.unlock();
 
 	commandList.push_back({"help", "- display the commands and their decription"});
 	commandList.push_back({"start_marquee", "- starts the marquee \"animation\""});
@@ -79,6 +79,35 @@ void enableEcho() {
 	HANDLE handler = GetStdHandle(STD_INPUT_HANDLE);
 	GetConsoleMode(handler, &mode);
 	SetConsoleMode(handler, mode | ENABLE_ECHO_INPUT);
+}
+
+void formattedPrint(std::vector<std::string> lines) {
+	std::vector<std::string> stringTokens;
+	std::string token;
+
+	size_t consumedSpace;
+
+	for (std::string line : lines) {
+		stringTokens = getToken(line);
+
+		consumedSpace = 0;
+		while (!stringTokens.empty()) {
+			token = stringTokens.at(0);
+			consumedSpace += token.length() + 1;
+
+			if (consumedSpace < lengthOfDisplay) {
+				std::cout << token << " ";
+			}
+			else {
+				std::cout << std::endl << token << " ";
+				consumedSpace = token.length();
+			}
+
+			stringTokens.erase(stringTokens.begin());
+		}
+
+		std::cout << std::endl;
+	}
 }
 
 // Tokenize a string

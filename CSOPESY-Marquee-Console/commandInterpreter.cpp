@@ -28,8 +28,8 @@ int main() {
 
 		if (!commandLine.empty()) {
 			// Locks
-			std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
-			mainMarqueeLock.unlock();
+			std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex);
+			commandMarqueeLock.unlock();
 
 			// Variables
 			std::vector<std::string> commandTokens = getToken(commandLine);
@@ -43,20 +43,20 @@ int main() {
 
 			// Command Logic
 			if (fToken == "help") {
-				mainMarqueeLock.lock();
+				commandMarqueeLock.lock();
 				printHelp = true;
-				mainMarqueeLock.unlock();
+				commandMarqueeLock.unlock();
 			}
 			else if (fToken == "start_marquee") {
-				mainMarqueeLock.lock();
+				commandMarqueeLock.lock();
 				marqueeRunning = true;
-				mainMarqueeLock.unlock();
+				commandMarqueeLock.unlock();
 				systemPrompt("NOTICE: Marquee animation has started.");
 			}
 			else if (fToken == "stop_marquee") {
-				mainMarqueeLock.lock();
+				commandMarqueeLock.lock();
 				marqueeRunning = false;
-				mainMarqueeLock.unlock();
+				commandMarqueeLock.unlock();
 				clearScreen();
 				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}

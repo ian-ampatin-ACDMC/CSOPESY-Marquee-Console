@@ -47,6 +47,8 @@ void keyboardHandlerThreadFunction() {
 			keyboardDisplayLock.unlock();
 			enterKeyPressed = false;
 		}
+
+		//std::this_thread::sleep_for(std::chrono::microseconds(refreshRate));
 	}
 }
 
@@ -56,18 +58,18 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 	std::vector<std::string> marqueeSubString = { "", "", "" };
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
-	std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex, std::defer_lock);
+	std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex, std::defer_lock);
 
 	std::string marqueeToPrint;
-	int textLength;
-	int speed;
+	size_t textLength;
+	size_t speed;
 
 	while (isRunning) {
-		mainMarqueeLock.lock();
+		commandMarqueeLock.lock();
 		marqueeToPrint = marqueeText;
 		textLength = marqueeText.length();
 		speed = marqueeSpeed;
-		mainMarqueeLock.unlock();
+		commandMarqueeLock.unlock();
 
 		if (!marqueeRunning) {
 			marqueeDisplayLock.lock();
@@ -125,45 +127,47 @@ void displayThreadFunction() {
 
 		// Marquee
 		if (marqueeRunning) {
-			gotoxy(0, 3);
 			marqueeDisplayLock.lock();
-			//std::cout << marqueeSubStrings.at(0) << marqueeSubStrings.at(1) << marqueeSubStrings.at(2);
+			gotoxy(0, 3);
 			std::cout << displayMarquee;
 			marqueeDisplayLock.unlock();
 		}
 
 		// Basic Information of the Project
-		gotoxy(0, 7);
-		std::cout << "Marquee Console for CSOPESY." << std::endl
-			<< "Version Date: 2025.09.22";
+		promptLock.lock();
+		gotoxy(0, 5);
+		formattedPrint(introductionText);
+		promptLock.unlock();
 
 		// Print the contents for the help command
 		if (printHelp) {
-			gotoxy(0, 10);
+			promptLock.lock();
+			gotoxy(0, 7);
 			printHelpFunction();
 			printHelp = false;
-		}
-
-		// One shot print blocks
-		if (printPrompt) {
-			gotoxy(65, 8);
-			promptLock.lock();
-			std::cout << systemPromptText;
 			promptLock.unlock();
-			printPrompt = false;
 		}
 
 		// Display what the user is typing
 		keyboardDisplayLock.lock();
 		if (backspacePressed) {
-			gotoxy(xCoordinateCommand, yCoordinateCommand);
+			gotoxy(lengthOfDisplay + 5, 5);
 			std::cout << "Command > " << std::string(displayCommand.length() + 1, ' ');
 			backspacePressed = false;
 		}
-		gotoxy(xCoordinateCommand, yCoordinateCommand);
+		gotoxy(lengthOfDisplay + 5, 5);
 		std::cout << "Command > " << displayCommand;
 		keyboardDisplayLock.unlock();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(refreshRate));
+		// Command prompts
+		if (printPrompt) {
+			promptLock.lock();
+			gotoxy(65, 6);
+			std::cout << systemPromptText;
+			printPrompt = false;
+			promptLock.unlock();
+		}
+
+		std::this_thread::sleep_for(std::chrono::microseconds(refreshRate));
 	}
 }

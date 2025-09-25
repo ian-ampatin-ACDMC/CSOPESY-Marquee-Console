@@ -15,9 +15,9 @@ void setMarqueeText(std::vector<std::string> tokens) {
 			newMarquee.append(subString);
 		}
 
-		std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+		std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex);
 		marqueeText = newMarquee;
-		mainMarqueeLock.unlock();
+		commandMarqueeLock.unlock();
 		systemPrompt("NOTICE: Marquee text has been edited.");
 	}
 }
@@ -35,9 +35,9 @@ void setMarqueeSpeed(std::vector<std::string> tokens) {
 			if (speed < 0)
 				systemPrompt("ERROR: set_speed cannot take a negative paramter.");
 			else if (check == tokens.at(0).length()) {
-				std::unique_lock<std::mutex> mainMarqueeLock(mainMarqueeMutex);
+				std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex);
 				marqueeSpeed = speed;
-				mainMarqueeLock.unlock();
+				commandMarqueeLock.unlock();
 				systemPrompt("NOTICE: Marquee animation speed has been edited.");
 			}
 			else {

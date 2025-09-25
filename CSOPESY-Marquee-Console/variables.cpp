@@ -1,39 +1,39 @@
 #include "gHeader.hpp"
 
 // --- Shared State and Thread Control ---
-// Global flat to signal all threads to exit
-std::string marqueeText = "[CSOPESY] Marquee Console";
+// Global flag to signal all threads to exit
 std::atomic<bool> isRunning{ true };
+
+// Multiple Thread Usage
 std::atomic<bool> marqueeRunning{ true };
-int xCoordinateCommand = 65;
-int yCoordinateCommand = 7;
-int lengthOfDisplay = 60;
+std::vector<std::string> introductionText = { "CSOPESY MCO2 - Marquee Console Program", "Version Date: 2025 / 09 / 25" };
+std::string marqueeText = "[CSOPESY] Marquee Console";
 size_t refreshRate = 50;
+size_t lengthOfDisplay = 60;
 
-// The command interpreter and display thread share this variable
-std::string promptDisplayBuffer = "";
-std::mutex promptMutex;
-
-// Shared state for the keyboard handler and command interpreter
-std::queue<std::string> commandQueue;
-std::mutex commandQueueMutex;
-
-// The marquee logic thread and display thread share this variable
-std::string displayMarquee = "";
-std::mutex marqueeDisplayMutex;
-
-// The keyboard handler thread and the display thread share this variable
-std::string displayCommand = "";
-std::mutex keyboardDisplayMutex;
-std::atomic<bool> backspacePressed{ false };
-
-// The main thread and marquee logic thread share this variable
-std::string systemPromptText = "";
-std::mutex mainMarqueeMutex;
+// Command Interpreter & Display Thread
 std::atomic<bool> printHelp{ false };
 std::atomic<bool> printPrompt{ false };
+std::mutex promptMutex;
+std::mutex commandDisplayMutex;
+std::string systemPromptText = "";
+
+// Command Interpreter & Marquee Logic Thread
+std::mutex commandMarqueeMutex;
 size_t marqueeSpeed = 100;
 
-// The main thread and display logic thread share this variable
-std::mutex mainDisplayMutex;
+// Command Interpreter & Keyboard Handler Thread
+std::mutex commandQueueMutex;
+std::queue<std::string> commandQueue;
+
+// Display Thread & Marquee Logic Thread
+std::mutex marqueeDisplayMutex;
+std::string displayMarquee = "";
+
+// Display Thread & Keyboard Handler Thread
+std::atomic<bool> backspacePressed{ false };
+std::mutex keyboardDisplayMutex;
+std::string displayCommand = "";
+
+// Display Thread Exclusive
 std::vector<std::vector<std::string>> registeredCommands;

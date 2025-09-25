@@ -17,42 +17,43 @@
 #include <stdexcept>
 
 // --- Shared State and Thread Control ---
-// Global flat to signal all threads to exit
-extern std::string marqueeText;
+// Global flag to signal all threads to exit
 extern std::atomic<bool> isRunning;
+
+// Multiple Thread Usage
 extern std::atomic<bool> marqueeRunning;
-extern int xCoordinateCommand;
-extern int yCoordinateCommand;
-extern int lengthOfDisplay;
+extern std::vector<std::string> introductionText;
+extern std::string marqueeText;
 extern size_t refreshRate;
+extern size_t lengthOfDisplay;
 
-// The command interpreter and display thread share this variable
-extern std::string promptDisplayBuffer;
-extern std::mutex promptMutex;
-
-// Shared state for the keyboard handler and command interpreter
-extern std::queue<std::string> commandQueue;
-extern std::mutex commandQueueMutex;
-
-// The marquee logic thread and display thread share this variable
-extern std::string displayMarquee;
-extern std::mutex marqueeDisplayMutex;
-
-// The keyboard handler thread and the display thread share this variable
-extern std::string displayCommand;
-extern std::mutex keyboardDisplayMutex;
-extern std::atomic<bool> backspacePressed;
-
-// The main thread and marquee logic thread share this variable
-extern std::string systemPromptText;
-extern std::mutex mainMarqueeMutex;
+// Command Interpreter & Display Thread
 extern std::atomic<bool> printHelp;
 extern std::atomic<bool> printPrompt;
+extern std::mutex promptMutex;
+extern std::mutex commandDisplayMutex;
+extern std::string systemPromptText;
+
+// Command Interpreter & Marquee Logic Thraed
+extern std::mutex commandMarqueeMutex;
 extern size_t marqueeSpeed;
 
-// The main thread and display logic thread share this variable
-extern std::mutex mainDisplayMutex;
+// Command Interpreter & Keyborad Handler
+extern std::mutex commandQueueMutex;
+extern std::queue<std::string> commandQueue;
+
+// Display Thread & Marquee Logic Thread
+extern std::mutex marqueeDisplayMutex;
+extern std::string displayMarquee;
+
+// Display Thread & Keyboard Handler Thread
+extern std::atomic<bool> backspacePressed;
+extern std::mutex keyboardDisplayMutex;
+extern std::string displayCommand;
+
+// Display Thread Exclusive
 extern std::vector<std::vector<std::string>> registeredCommands;
+
 
 // --- Utility Functions ---
 void clearScreen();
@@ -60,6 +61,7 @@ void gotoxy(int x, int y);
 void printHelpFunction();
 void disableEcho();
 void enableEcho();
+void formattedPrint(std::vector<std::string> lines);
 std::vector<std::string> getToken(std::string line);
 
 // --- Thread Function --- 
