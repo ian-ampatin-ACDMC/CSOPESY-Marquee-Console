@@ -1,12 +1,11 @@
 #include "gHeader.hpp"
 
 void keyboardHandlerThreadFunction() {
-	std::string commandLine = "";
 	std::atomic<bool> enterKeyPressed = false;
+	std::string commandLine = "";
+	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
 
 	char key;
-
-	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
 
 	while (isRunning) {
 		key = _getch();
@@ -14,7 +13,7 @@ void keyboardHandlerThreadFunction() {
 		if (key == '\n' || key == '\r') {
 			enterKeyPressed = true;
 		}
-		else if (key == 8) {
+		else if (key == '\b') {
 			if (!commandLine.empty())
 				commandLine.pop_back();
 
@@ -48,7 +47,7 @@ void keyboardHandlerThreadFunction() {
 			enterKeyPressed = false;
 		}
 
-		//std::this_thread::sleep_for(std::chrono::microseconds(refreshRate));
+		std::this_thread::sleep_for(std::chrono::microseconds(refreshRate));
 	}
 }
 
@@ -142,7 +141,7 @@ void displayThreadFunction() {
 		// Print the contents for the help command
 		if (printHelp) {
 			promptLock.lock();
-			gotoxy(0, 7);
+			gotoxy(0, 8);
 			printHelpFunction();
 			printHelp = false;
 			promptLock.unlock();

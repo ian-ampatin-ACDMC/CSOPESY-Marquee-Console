@@ -11,14 +11,13 @@ void clearScreen() {
 
 // Moves the cursor to a specific (x, y) coordinate on the console.
 void gotoxy(int x, int y) {
-	std::cout << "\033[" << y << ";" << x << "H";
-	std::cout.flush();
+	std::cout << std::flush << "\033[" << y << ";" << x << "H" << std::flush;
 }
 
 // Print the commands that are recognized by the program
 void printHelpFunction() {
 	int padding = 20;
-	int descriptionSpace = lengthOfDisplay - padding;
+	size_t descriptionSpace = lengthOfDisplay - padding;
 	size_t consumedSpace;
 	std::string token;
 
@@ -41,7 +40,7 @@ void printHelpFunction() {
 
 	for (std::vector<std::string> command : commandList) {
 		stringTokens = getToken(command.at(1));
-		std::cout << std::left << std::setw(padding) << command.at(0); // << command.at(1) << std::endl;
+		std::cout << std::left << std::setw(padding) << command.at(0); 
 		
 		// Print Description
 		consumedSpace = 0;

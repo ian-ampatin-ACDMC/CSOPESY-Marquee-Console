@@ -8,7 +8,7 @@ std::atomic<bool> isRunning{ true };
 std::atomic<bool> marqueeRunning{ true };
 std::vector<std::string> introductionText = { "CSOPESY MCO2 - Marquee Console Program", "Version Date: 2025 / 09 / 25" };
 std::string marqueeText = "[CSOPESY] Marquee Console";
-size_t refreshRate = 50;
+size_t refreshRate = 10;
 size_t lengthOfDisplay = 60;
 
 // Command Interpreter & Display Thread
