@@ -131,7 +131,7 @@ void displayThreadFunction() {
 		// Marquee
 		if (marqueeRunning) {
 			marqueeDisplayLock.lock();
-			gotoxy(0, 3);
+			gotoxy(0, startingPrintRow);
 			std::cout << displayMarquee;
 			marqueeDisplayLock.unlock();
 		}

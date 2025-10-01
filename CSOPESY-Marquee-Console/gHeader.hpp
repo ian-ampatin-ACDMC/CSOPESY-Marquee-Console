@@ -56,6 +56,7 @@ extern std::string displayCommand;
 
 // Display Thread Exclusive
 extern std::vector<std::vector<std::string>> registeredCommands;
+extern size_t startingPrintRow;
 
 // --- Utility Functions ---
 void clearScreen();

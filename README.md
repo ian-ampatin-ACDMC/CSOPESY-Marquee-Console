@@ -43,6 +43,7 @@ Entry Class File: commandInterpreter.cpp
 	generalDisplayWidth 50
 	commandDipslayWidth 50
 	defaultMarqueeSpeed 100
+	startingPrintRow 3
 	```
 
 1.  Type the following commands into the terminal.
@@ -58,3 +59,4 @@ There are three parameters that can be edited via this file.
 - The width of the marquee, help function, and the default information text. **[ generalDisplayWidth (PARAMETER - integer)]**
 - The maximum number of characters a command can have before being printed to the next line. **[ commandDisplayWidth (PARAMETER - integer)]**
 - The default speed of the marquee animation. **[ defaultMarqueeSpeed (PARAMETER - integer)]**
+- The row where you start printing. **[ startingPrintRow (PARAMETER - integer)]**

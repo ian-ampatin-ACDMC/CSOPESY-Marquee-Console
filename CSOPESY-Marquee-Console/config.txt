@@ -1,3 +1,4 @@
-generalDisplayWidth 30
+generalDisplayWidth 50
 commandDisplayWidth 30
-defaultMarqueeSpeed 1000
+defaultMarqueeSpeed 50
+startingPrintRow 3

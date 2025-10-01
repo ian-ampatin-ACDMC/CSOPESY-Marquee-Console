@@ -1,1 +1,32 @@
-﻿  CSOPESY-Marquee-Console.vcxproj -> C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\x64\Debug\CSOPESY-Marquee-Console.exe
+﻿  commandInterpreter.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits(1680,67): warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data
+  (compiling source file 'commandInterpreter.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits(1680,67):
+      the template instantiation context (the oldest one first) is
+          C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\commandInterpreter.cpp(45,32):
+          see reference to function template instantiation 'std::thread::thread<void(__cdecl &)(int),size_t&,0>(_Fn,size_t &)' being compiled
+          with
+          [
+              _Fn=void (__cdecl &)(int)
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\thread(93,9):
+          see reference to function template instantiation 'void std::thread::_Start<void(__cdecl &)(int),size_t&>(_Fn,size_t &)' being compiled
+          with
+          [
+              _Fn=void (__cdecl &)(int)
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\thread(76,40):
+          see reference to function template instantiation 'unsigned int (__cdecl *std::thread::_Get_invoke<std::thread::_Start::_Tuple,0,1>(std::integer_sequence<size_t,0,1>) noexcept)(void *) noexcept' being compiled
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\thread(67,17):
+          see reference to function template instantiation 'unsigned int std::thread::_Invoke<std::thread::_Start::_Tuple,0,1>(void *) noexcept' being compiled
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\thread(60,14):
+          see reference to function template instantiation 'void std::invoke<void(__cdecl *)(int),unsigned __int64,>(_Callable &&,_Ty1 &&) noexcept(false)' being compiled
+          with
+          [
+              _Callable=void (__cdecl *)(int),
+              _Ty1=unsigned __int64
+          ]
+  
+  variables.cpp
+  Generating Code...
+  CSOPESY-Marquee-Console.vcxproj -> C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\x64\Debug\CSOPESY-Marquee-Console.exe

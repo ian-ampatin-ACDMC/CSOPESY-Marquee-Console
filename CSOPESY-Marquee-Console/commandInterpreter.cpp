@@ -21,6 +21,8 @@ int main() {
 			commandDisplayLength = std::stoi(fileTokens.at(1));
 		else if (fileFirstToken == "defaultMarqueeSpeed")
 			marqueeSpeed = std::stoi(fileTokens.at(1));
+		else if (fileFirstToken == "startingPrintRow")
+			startingPrintRow = std::stoi(fileTokens.at(1));
 	}
 
 	file.close();
@@ -40,7 +42,7 @@ int main() {
 	std::cout.flush();
 
 	// Start the three worker threads.
-	std::thread marqueeLogicThread(marqueeLogicThreadFunction, lengthOfDisplay);
+	std::thread marqueeLogicThread(marqueeLogicThreadFunction, (lengthOfDisplay < 40) ? lengthOfDisplay = 40 : lengthOfDisplay);
 	std::thread displayThread(displayThreadFunction);
 	std::thread keyboardHandlerThread(keyboardHandlerThreadFunction);
 

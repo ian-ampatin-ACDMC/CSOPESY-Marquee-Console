@@ -39,3 +39,4 @@ std::string displayCommand = "";
 
 // Display Thread Exclusive
 std::vector<std::vector<std::string>> registeredCommands;
+size_t startingPrintRow;
