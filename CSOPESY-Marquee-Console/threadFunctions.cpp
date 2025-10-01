@@ -20,7 +20,6 @@ void keyboardHandlerThreadFunction() {
 			keyboardDisplayLock.lock();
 			if (!displayCommand.empty()) {
 				displayCommand.pop_back();
-				backspacePressed = true;
 			}
 			keyboardDisplayLock.unlock();
 		}
@@ -119,6 +118,10 @@ void displayThreadFunction() {
 	std::unique_lock<std::mutex> marqueeDisplayLock(marqueeDisplayMutex, std::defer_lock);
 	std::unique_lock<std::mutex> promptLock(promptMutex, std::defer_lock);
 	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
+	std::string commandCopy;
+	std::atomic<bool> commandPrintFinished;
+	int lengthOfCommandCopy;
+	size_t currentCommandPrintLine;
 	while (isRunning) {
 
 		// Marquee
@@ -146,19 +149,30 @@ void displayThreadFunction() {
 
 		// Display what the user is typing
 		keyboardDisplayLock.lock();
-		if (backspacePressed) {
-			gotoxy(lengthOfDisplay + 5, 5);
-			std::cout << "Command > " << std::string(displayCommand.length() + 1, ' ');
-			backspacePressed = false;
+		commandPrintFinished = false;
+		currentCommandPrintLine = 5;
+		gotoxy(lengthOfDisplay + 5, currentCommandPrintLine);
+
+		commandCopy = displayCommand;
+		lengthOfCommandCopy = commandCopy.length() + 5;
+
+		while (!commandPrintFinished) {
+			if (commandCopy.length() > 30) {
+				std::cout << "Command > " << commandCopy.substr(0, 30);
+				commandCopy = commandCopy.substr(31);
+				gotoxy(lengthOfDisplay + 5, currentCommandPrintLine += 1);
+			}
+			else {
+				std::cout << "Command > " << commandCopy << "     "; // trailing ' ' string is for when backspace is pressed
+				commandPrintFinished = true;
+			}
 		}
-		gotoxy(lengthOfDisplay + 5, 5);
-		std::cout << "Command > " << displayCommand;
 		keyboardDisplayLock.unlock();
 
 		// Command prompts
 		if (printPrompt) {
 			promptLock.lock();
-			gotoxy(65, 6);
+			gotoxy(lengthOfDisplay +  5, 6);
 			std::cout << systemPromptText;
 			printPrompt = false;
 			promptLock.unlock();

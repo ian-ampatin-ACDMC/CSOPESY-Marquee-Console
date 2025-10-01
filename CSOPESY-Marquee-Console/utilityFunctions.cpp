@@ -10,8 +10,10 @@ void clearScreen() {
 }
 
 // Moves the cursor to a specific (x, y) coordinate on the console.
-void gotoxy(int x, int y) {
-	std::cout << std::flush << "\033[" << y << ";" << x << "H" << std::flush;
+void gotoxy(size_t x, size_t y) {
+	std::unique_lock<std::mutex> displayLock(commandDisplayMutex);
+	std::cout << "\033[" << y << ";" << x << "H" << std::flush;
+	displayLock.unlock();
 }
 
 // Print the commands that are recognized by the program

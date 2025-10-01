@@ -47,7 +47,6 @@ extern std::mutex marqueeDisplayMutex;
 extern std::string displayMarquee;
 
 // Display Thread & Keyboard Handler Thread
-extern std::atomic<bool> backspacePressed;
 extern std::mutex keyboardDisplayMutex;
 extern std::string displayCommand;
 
@@ -57,7 +56,7 @@ extern std::vector<std::vector<std::string>> registeredCommands;
 
 // --- Utility Functions ---
 void clearScreen();
-void gotoxy(int x, int y);
+void gotoxy(size_t x, size_t y);
 void printHelpFunction();
 void disableEcho();
 void enableEcho();

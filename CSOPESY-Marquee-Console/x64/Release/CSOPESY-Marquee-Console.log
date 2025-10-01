@@ -1,0 +1,8 @@
+﻿  threadFunctions.cpp
+C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\threadFunctions.cpp(157,46): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  Generating code
+  2 of 604 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    3 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  CSOPESY-Marquee-Console.vcxproj -> C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\x64\Release\CSOPESY-Marquee-Console.exe

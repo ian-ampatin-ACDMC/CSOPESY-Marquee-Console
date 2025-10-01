@@ -31,7 +31,6 @@ std::mutex marqueeDisplayMutex;
 std::string displayMarquee = "";
 
 // Display Thread & Keyboard Handler Thread
-std::atomic<bool> backspacePressed{ false };
 std::mutex keyboardDisplayMutex;
 std::string displayCommand = "";
 
