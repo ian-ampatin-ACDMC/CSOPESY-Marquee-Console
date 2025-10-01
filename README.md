@@ -22,6 +22,8 @@ Entry Class File: commandInterpreter.cpp
 1.	Open Visual Studio.
 1.	Select **Open Project or Solution**.
 1.	Open the repository and select the *[APPLICATION NAME].sln* file.
+1.	Open the *config.txt* file and change the default values to your liking.
+1.	Run the program by clicking the green arrow head.
 	
 ### Run the program with the executable only (Windows)
 1.	Open a subdirectory for the GitHub repository. </br>
