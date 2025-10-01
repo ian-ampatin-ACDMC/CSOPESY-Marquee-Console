@@ -3,7 +3,7 @@
 Developer: Ampatin, Ian Kenneth J.</br>
 Last Update: 2025 - 10 - 01
 
-Entry File: commandInterpreter.cpp
+Entry Class File: commandInterpreter.cpp
 
 ## Running the Program
 ### Compile and Run on your Local Machine with Visual Studio
