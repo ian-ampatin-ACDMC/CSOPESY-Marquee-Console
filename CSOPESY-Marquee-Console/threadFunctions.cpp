@@ -28,6 +28,10 @@ void keyboardHandlerThreadFunction() {
 
 			keyboardDisplayLock.lock();
 			displayCommand += key;
+			if (newCommandAccept) {
+				newCommandStarted = true;
+				newCommandAccept = false;
+			}
 			keyboardDisplayLock.unlock();
 		}
 
@@ -42,6 +46,7 @@ void keyboardHandlerThreadFunction() {
 			commandLine = "";
 			keyboardDisplayLock.lock();
 			displayCommand = "";
+			newCommandAccept = true;
 			keyboardDisplayLock.unlock();
 			enterKeyPressed = false;
 		}
@@ -71,7 +76,6 @@ void marqueeLogicThreadFunction(int displayWidth) {
 
 		if (!marqueeRunning) {
 			marqueeDisplayLock.lock();
-			//marqueeSubStrings.at(0) = std::string(displayWidth, ' ');
 			displayMarquee = "";
 			marqueeDisplayLock.unlock();
 			startingPosition = displayWidth;
@@ -120,8 +124,8 @@ void displayThreadFunction() {
 	std::unique_lock<std::mutex> keyboardDisplayLock(keyboardDisplayMutex, std::defer_lock);
 	std::string commandCopy;
 	std::atomic<bool> commandPrintFinished;
-	int lengthOfCommandCopy;
 	size_t currentCommandPrintLine;
+
 	while (isRunning) {
 
 		// Marquee
@@ -151,16 +155,24 @@ void displayThreadFunction() {
 		keyboardDisplayLock.lock();
 		commandPrintFinished = false;
 		currentCommandPrintLine = 5;
-		gotoxy(lengthOfDisplay + 5, currentCommandPrintLine);
 	
 		commandCopy = displayCommand;
-		lengthOfCommandCopy = commandCopy.length() + 5;
 
+		if (newCommandStarted) {
+			promptLock.lock();
+			gotoxy(lengthOfDisplay + 5, 6);
+			std::cout << std::string(50, ' ');
+			printPrompt = false;
+			promptLock.unlock();
+			newCommandStarted = false;
+		}
+
+		gotoxy(lengthOfDisplay + 5, currentCommandPrintLine);
 		std::cout << "Command > ";
 		while (!commandPrintFinished) {
-			if (commandCopy.length() > 30) {
-				std::cout << commandCopy.substr(0, 30);
-				commandCopy = commandCopy.substr(31);
+			if (commandCopy.length() > commandDisplayLength) {
+				std::cout << commandCopy.substr(0, commandDisplayLength);
+				commandCopy = commandCopy.substr(commandDisplayLength + 1);
 				gotoxy(lengthOfDisplay + 15, currentCommandPrintLine += 1);
 			}
 			else {

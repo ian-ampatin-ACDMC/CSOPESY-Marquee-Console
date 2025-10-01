@@ -15,6 +15,7 @@
 #include <conio.h>
 #include <Windows.h>
 #include <stdexcept>
+#include <fstream>
 
 // --- Shared State and Thread Control ---
 // Global flag to signal all threads to exit
@@ -26,6 +27,7 @@ extern std::vector<std::string> introductionText;
 extern std::string marqueeText;
 extern size_t refreshRate;
 extern size_t lengthOfDisplay;
+extern size_t commandDisplayLength;
 
 // Command Interpreter & Display Thread
 extern std::atomic<bool> printHelp;
@@ -47,12 +49,13 @@ extern std::mutex marqueeDisplayMutex;
 extern std::string displayMarquee;
 
 // Display Thread & Keyboard Handler Thread
+extern std::atomic<bool> newCommandStarted;
+extern std::atomic<bool> newCommandAccept;
 extern std::mutex keyboardDisplayMutex;
 extern std::string displayCommand;
 
 // Display Thread Exclusive
 extern std::vector<std::vector<std::string>> registeredCommands;
-
 
 // --- Utility Functions ---
 void clearScreen();

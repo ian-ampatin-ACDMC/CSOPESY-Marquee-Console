@@ -2,6 +2,36 @@
 
 // --- Main Function (Command Interpreter Thread) ---
 int main() {
+	// Get the default values 
+	std::fstream file("config.txt");
+
+	if (!file.is_open()) 
+		return 1;
+
+	std::vector<std::string> fileTokens;
+	std::string line;
+	std::string fileFirstToken;
+	while (std::getline(file, line)) {
+		fileTokens = getToken(line);
+		fileFirstToken = fileTokens.at(0);
+
+		if (fileFirstToken == "generalDisplayWidth")
+			lengthOfDisplay = std::stoi(fileTokens.at(1));
+		else if (fileFirstToken == "commandDisplayWidth")
+			commandDisplayLength = std::stoi(fileTokens.at(1));
+		else if (fileFirstToken == "defaultMarqueeSpeed")
+			marqueeSpeed = std::stoi(fileTokens.at(1));
+	}
+
+	file.close();
+
+
+	// Locks
+	std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex, std::defer_lock);
+
+	// Variables
+	std::string commandLine;
+
 	// Disable echo
 	disableEcho();
 
@@ -16,7 +46,6 @@ int main() {
 
 	// Main loop that processes commands from the queue
 	while (isRunning) {
-		std::string commandLine;
 		{
 			std::unique_lock<std::mutex> lock(commandQueueMutex);
 			
@@ -24,13 +53,11 @@ int main() {
 				commandLine = commandQueue.front();
 				commandQueue.pop();
 			}
+
+			lock.unlock();
 		}
 
 		if (!commandLine.empty()) {
-			// Locks
-			std::unique_lock<std::mutex> commandMarqueeLock(commandMarqueeMutex);
-			commandMarqueeLock.unlock();
-
 			// Variables
 			std::vector<std::string> commandTokens = getToken(commandLine);
 			std::string fToken = commandTokens.at(0);
@@ -57,7 +84,6 @@ int main() {
 				commandMarqueeLock.lock();
 				marqueeRunning = false;
 				commandMarqueeLock.unlock();
-				clearScreen();
 				systemPrompt("NOTICE: Marquee animation has stopped.");
 			}
 			else if (fToken == "set_text") {
@@ -72,6 +98,8 @@ int main() {
 			else {
 				systemPrompt("ERROR: Command is not recognized.");
 			}
+
+			commandLine = "";
 		}
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));

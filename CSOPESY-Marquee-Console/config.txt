@@ -1,0 +1,3 @@
+generalDisplayWidth 40
+commandDisplayWidth 30
+defaultMarqueeSpeed 100
