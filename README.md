@@ -35,7 +35,8 @@ Entry Class File: commandInterpreter.cpp
 		``git clone [YOUR SSH URL]`` </br> If it is the first time you are using the SSH key, type *yes*.
 		Enter your SSH key password if you have set one up.
 		
-1.	Type the following commands into the terminal.
+1.	Copy the *confit.txt* file to the same location as the executable file.
+1.  Type the following commands into the terminal.
 	```
 	cd [APPLICATION NAME]\x64\Release\
 	start [APPLICAITON NAME].exe
@@ -45,6 +46,6 @@ Entry Class File: commandInterpreter.cpp
 The *config.txt* file contains the default values and fixed parameters of the program.
 There are three parameters that can be edited via this file.
 
-- The width of the marquee, help function, and the default information text. **[ generalDisplayWidth ]**
-- The maximum number of characters a command can have before being printed to the next line. **[ commandDisplayWidth ]**
-- The default speed of the marquee animation. **[ defaultMarqueeSpeed ]**
+- The width of the marquee, help function, and the default information text. **[ generalDisplayWidth (PARAMETER - integer)]**
+- The maximum number of characters a command can have before being printed to the next line. **[ commandDisplayWidth (PARAMETER - integer)]**
+- The default speed of the marquee animation. **[ defaultMarqueeSpeed (PARAMETER - integer)]**
