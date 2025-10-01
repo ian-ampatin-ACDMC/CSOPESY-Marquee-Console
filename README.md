@@ -3,6 +3,8 @@
 Developer: Ampatin, Ian Kenneth J.</br>
 Last Update: 2025 - 10 - 01
 
+Entry File: commandInterpreter.cpp
+
 ## Running the Program
 ### Compile and Run on your Local Machine with Visual Studio
 1.	Open a subdirectory for the GitHub repository. </br>
@@ -40,3 +42,9 @@ Last Update: 2025 - 10 - 01
 	```
 
 ## The "config.txt" file
+The *config.txt* file contains the default values and fixed parameters of the program.
+There are three parameters that can be edited via this file.
+
+- The width of the marquee, help function, and the default information text. **[ generalDisplayWidth ]**
+- The maximum number of characters a command can have before being printed to the next line. **[ commandDisplayWidth ]**
+- The default speed of the marquee animation. **[ defaultMarqueeSpeed ]**

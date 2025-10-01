@@ -1,7 +1,4 @@
-﻿  commandFunctions.cpp
-C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\commandFunctions.cpp(48,38): warning C4101: 'e': unreferenced local variable
-C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\commandFunctions.cpp(51,34): warning C4101: 'e': unreferenced local variable
-  commandInterpreter.cpp
+﻿  commandInterpreter.cpp
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits(1680,67): warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data
   (compiling source file 'commandInterpreter.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits(1680,67):
@@ -30,12 +27,14 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.3520
               _Ty1=unsigned __int64
           ]
   
+  commandFunctions.cpp
+C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\commandFunctions.cpp(48,38): warning C4101: 'e': unreferenced local variable
+C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\CSOPESY-Marquee-Console\commandFunctions.cpp(51,34): warning C4101: 'e': unreferenced local variable
   threadFunctions.cpp
   utilityFunctions.cpp
   variables.cpp
   Generating code
-  127 of 665 functions (19.1%) were compiled, the rest were copied from previous compilation.
-    61 functions were new in current compilation
-    48 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB not found, fall back to full compilation.
+  All 665 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   CSOPESY-Marquee-Console.vcxproj -> C:\Users\Academic (DLSU)\source\repos\CSOPESY-Marquee-Console\x64\Release\CSOPESY-Marquee-Console.exe
