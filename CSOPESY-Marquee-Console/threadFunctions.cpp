@@ -89,7 +89,6 @@ void marqueeLogicThreadFunction(int displayWidth) {
 				}
 				else {
 					marqueeSubString.at(1) = marqueeToPrint.substr(0, difference);
-					//marqueeSubString.at(2) = std::string(displayWidth - difference, ' ');
 					marqueeSubString.at(2) = "";
 				}
 			}
@@ -98,8 +97,6 @@ void marqueeLogicThreadFunction(int displayWidth) {
 					startingPosition = displayWidth;
 				else
 					marqueeSubString.at(1) = marqueeToPrint.substr(abs(startingPosition), startingPosition + textLength);
-
-				//marqueeSubString.at(1) = "Starting Position: " + std::to_string(startingPosition) + " | Condition : " + std::to_string(startingPosition + textLength);
 			}
 
 			marqueeDisplayLock.lock();
