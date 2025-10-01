@@ -35,7 +35,14 @@ Entry Class File: commandInterpreter.cpp
 		``git clone [YOUR SSH URL]`` </br> If it is the first time you are using the SSH key, type *yes*.
 		Enter your SSH key password if you have set one up.
 		
-1.	Copy the *confit.txt* file to the same location as the executable file.
+1.	Copy/Create the *confit.txt* file to the same location as the executable file. It should look like:
+	
+	```
+	generalDisplayWidth 50
+	commandDipslayWidth 50
+	defaultMarqueeSpeed 100
+	```
+
 1.  Type the following commands into the terminal.
 	```
 	cd [APPLICATION NAME]\x64\Release\
