@@ -152,18 +152,19 @@ void displayThreadFunction() {
 		commandPrintFinished = false;
 		currentCommandPrintLine = 5;
 		gotoxy(lengthOfDisplay + 5, currentCommandPrintLine);
-
+	
 		commandCopy = displayCommand;
 		lengthOfCommandCopy = commandCopy.length() + 5;
 
+		std::cout << "Command > ";
 		while (!commandPrintFinished) {
 			if (commandCopy.length() > 30) {
-				std::cout << "Command > " << commandCopy.substr(0, 30);
+				std::cout << commandCopy.substr(0, 30);
 				commandCopy = commandCopy.substr(31);
-				gotoxy(lengthOfDisplay + 5, currentCommandPrintLine += 1);
+				gotoxy(lengthOfDisplay + 15, currentCommandPrintLine += 1);
 			}
 			else {
-				std::cout << "Command > " << commandCopy << "     "; // trailing ' ' string is for when backspace is pressed
+				std::cout << commandCopy << "     "; // trailing ' ' string is for when backspace is pressed
 				commandPrintFinished = true;
 			}
 		}
